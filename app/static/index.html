@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keitaro Studio — кампании и офферы</title>
+  <link rel="stylesheet" href="/static/styles.css?v=2">
+  <script src="/static/app.js?v=2" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">K</span><span>KEITARO<span class="brand-light"> STUDIO</span></span></div>
+      <div class="side-label">РАБОЧЕЕ МЕСТО</div>
+      <button class="nav active" data-panel="create"><span class="nav-icon">＋</span> Новая кампания</button>
+      <button class="nav" data-panel="editor"><span class="nav-icon">▤</span> Редактор офферов</button>
+      <div class="side-bottom"><span class="status-dot" id="status-dot"></span><span id="connection-status">Проверка подключения</span></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar"><div class="eyebrow">ПАНЕЛЬ УПРАВЛЕНИЯ / KEITARO ADMIN API</div><div class="top-badge">ТЕСТОВОЕ ЗАДАНИЕ</div></header>
+
+      <section id="setup-banner" class="setup-banner hidden" role="alert">
+        <strong>Подключите Keitaro</strong>
+        <span>Заполните <code>KEITARO_BASE_URL</code> и <code>KEITARO_API_KEY</code> в файле <code>.env</code>, затем перезапустите сервер.</span>
+      </section>
+
+      <section id="create-panel" class="panel">
+        <div class="page-heading"><div><div class="eyebrow accent">01 / СОЗДАНИЕ</div><h1>Новая кампания</h1><p>Одна страна отправляется на Google. Остальной трафик идёт на выбранный оффер.</p></div><div class="heading-symbol">↗</div></div>
+        <div class="content-grid">
+          <form id="create-form" class="card form-card">
+            <div class="card-heading"><span class="step">01</span><div><h2>Параметры кампании</h2><p>Название, аудитория и оффер</p></div></div>
+            <label>Название кампании<span class="required">*</span><div class="input-prefix"><span id="prefix-label">test_frolov_</span><input id="campaign-name" name="name" placeholder="my_campaign" required maxlength="100" autocomplete="off"></div></label>
+            <div class="two-col"><label>Страна (ISO 3166-1 alpha-2)<span class="required">*</span><input name="country" placeholder="AU" required maxlength="2" pattern="[A-Za-z]{2}" autocomplete="off"></label><label>ID оффера<span class="required">*</span><input name="offer_id" type="number" min="1" placeholder="3749" required></label></div>
+            <div class="divider"></div>
+            <div class="card-heading compact"><span class="step">02</span><div><h2>Настройки трекера</h2><p>Домен, группа и источник из Keitaro</p></div></div>
+            <label>Домен<span class="required">*</span><select id="domain-select" name="domain_id" required><option value="">Загрузка…</option></select></label>
+            <div class="two-col"><label>Группа<span class="required">*</span><select id="group-select" name="group_id" required><option value="">Загрузка…</option></select></label><label>Источник<span class="required">*</span><select id="source-select" name="traffic_source_id" required><option value="">Загрузка…</option></select></label></div>
+            <button class="primary-button" id="create-button" type="submit">Создать кампанию <span>↗</span></button>
+          </form>
+          <div class="right-column">
+            <div class="card route-card"><div class="mini-label">СХЕМА МАРШРУТИЗАЦИИ</div><div class="route-item"><div class="route-index blue">01</div><div><strong>Поток с фильтром</strong><p>Совпадение по стране → Google</p></div></div><div class="route-line"></div><div class="route-item"><div class="route-index violet">02</div><div><strong>Поток по умолчанию</strong><p>Все остальные → выбранный оффер</p></div></div><div class="note">Кампания создаётся с ротацией по позиции. Первый поток перехватывает нужную страну, второй служит запасным маршрутом.</div></div>
+            <div class="card result-card" id="create-result"><div class="mini-label">РЕЗУЛЬТАТ</div><h3>Готово к запуску</h3><p>После создания здесь появится ID кампании и ссылка на её редактирование.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="editor-panel" class="panel hidden">
+        <div class="page-heading"><div><div class="eyebrow accent">02 / РЕДАКТОР</div><h1>Офферы кампании</h1><p>Данные загружаются из Keitaro. Сохраняются только офферы выбранного потока.</p></div><button class="secondary-button" id="refresh-button" type="button">↻ Обновить</button></div>
+        <div class="editor-controls card"><label>Кампания<select id="campaign-select"><option value="">Выберите кампанию</option></select></label><label>Поток с офферами<select id="stream-select"><option value="">Выберите поток</option></select></label></div>
+        <div class="editor-layout"><div class="card editor-card"><div class="card-heading"><span class="step">↗</span><div><h2>Распределение трафика</h2><p id="stream-description">Выберите кампанию и поток</p></div></div><div id="offers-list" class="offers-list"><div class="empty-state">Здесь появятся офферы выбранного потока</div></div><div class="add-row"><select id="offer-select" aria-label="Оффер для добавления"><option value="">Выберите оффер для добавления</option></select><button class="secondary-button" id="add-button" type="button">＋ Добавить</button></div><div class="editor-footer"><div><strong id="share-total">Итого: 0%</strong><small id="share-hint">Сумма активных долей должна быть 100%</small></div><div class="editor-actions"><button class="text-button" id="balance-button" type="button">Выровнять доли</button><button class="primary-button" id="save-button" type="button">Сохранить изменения ↗</button></div></div></div><div class="right-column"><div class="card info-card"><div class="mini-label">КАК ЭТО РАБОТАЕТ</div><h3>Точные доли</h3><p>Добавляйте и удаляйте офферы, задавайте процент вручную. Сохранение доступно только при сумме 100%.</p><div class="info-line"><span>Источник данных</span><strong>Keitaro Admin API</strong></div><div class="info-line"><span>Защита изменений</span><strong>Проверка версии</strong></div></div><div class="card history-card"><div class="mini-label">ПОСЛЕДНИЕ ДЕЙСТВИЯ</div><div id="history-list"><p class="muted">Пока нет действий</p></div></div></div></div>
+      </section>
+      <div id="toast" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+</body>
+</html>
+
